@@ -18,7 +18,7 @@ export const deleteBid = async (req, res, next) => {
   }
 
   if (req.user.id !== bid.userRef) {
-    return next(errorHandler(401, "You can only delete your own bids!"));
+    return next(errorHandler(401, "You can only delete your own bids"));
   }
 
   try {
