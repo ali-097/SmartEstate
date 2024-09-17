@@ -1,9 +1,13 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import pickle
 import pandas as pd
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Enable CORS
+CORS(app)
 
 # Load the model and ColumnTransformer
 knn_regressor = pickle.load(open('KNN_model.pkl', 'rb'))

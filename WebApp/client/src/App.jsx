@@ -15,6 +15,7 @@ import MyListings from "./pages/MyListings";
 import MyBids from "./pages/MyBids";
 import UpdateListing from "./pages/UpdateListing";
 import Search from "./pages/Search";
+import PricePrediction from "./pages/PricePrediction";
 
 function App() {
   return (
@@ -31,7 +32,7 @@ function App() {
         <Route path="/my-listings" element={<MyListings />} />
         <Route path="/my-bids" element={<MyBids />} />
         <Route path="/search" element={<Search />} />
-
+        <Route path="/price-prediction" element={<PricePrediction />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-listing" element={<CreateListing />} />

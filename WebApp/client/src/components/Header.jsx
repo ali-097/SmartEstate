@@ -29,6 +29,14 @@ const links = [
     name: "Contact",
     href: "/contact",
   },
+  {
+    name: "Price Prediction",
+    href: "/price-prediction",
+  },
+  {
+    name: "Community reviews",
+    href: "/community-reviews",
+  },
 ];
 
 const Header = () => {
