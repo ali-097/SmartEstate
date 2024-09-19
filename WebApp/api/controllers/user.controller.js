@@ -3,6 +3,7 @@ import User from "../models/user.model.js";
 import { errorHandler } from "../utils/error.js";
 import Listing from "../models/listing.model.js";
 import Bid from "../models/bid.model.js";
+import Review from "../models/review.model.js";
 
 export const test = (req, res) => {
   res.json({
@@ -88,5 +89,18 @@ export const getUser = async (req, res, next) => {
     res.status(200).json(rest);
   } catch (error) {
     next(error);
+  }
+};
+
+export const getUserReviews = async (req, res, next) => {
+  if (req.user.id === req.params.id) {
+    try {
+      const reviews = await Review.find({ userRef: req.params.id });
+      res.status(200).json(reviews);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    return next(errorHandler(401, "You can only view your own reviews!"));
   }
 };

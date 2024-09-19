@@ -269,6 +269,24 @@ const Profile = () => {
               View your Listings
             </Link>
           </div>
+
+          <div className="mt-2 flex items-center justify-center">
+            <Link
+              to={"/create-review"}
+              className="mt-4 bg-gradient-to-r from-blue-500 via-blue-300 to-blue-500 flex items-center gap-2 w-full justify-center rounded-md bg-gray-100 px-3 py-1.5"
+            >
+              Create Review
+            </Link>
+          </div>
+          <div className="mt-2 flex items-center justify-center">
+            <Link
+              to={"/my-reviews"}
+              className="mt-4 bg-gradient-to-r from-blue-500 via-blue-300 to-blue-500 flex items-center gap-2 w-full justify-center rounded-md bg-gray-100 px-3 py-1.5"
+            >
+              View your Reviews
+            </Link>
+          </div>
+
           <div className="mt-2 flex items-center justify-center">
             <Link
               to={"/my-bids"}

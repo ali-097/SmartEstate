@@ -16,6 +16,9 @@ import MyBids from "./pages/MyBids";
 import UpdateListing from "./pages/UpdateListing";
 import Search from "./pages/Search";
 import PricePrediction from "./pages/PricePrediction";
+import CreateReview from "./pages/CreateReview";
+import MyReviews from "./pages/MyReviews";
+import CommunityReviews from "./pages/CommunityReviews";
 
 function App() {
   return (
@@ -31,8 +34,10 @@ function App() {
         <Route path="/sign-up" element={<Register />} />
         <Route path="/my-listings" element={<MyListings />} />
         <Route path="/my-bids" element={<MyBids />} />
+        <Route path="/my-reviews" element={<MyReviews />} />
         <Route path="/search" element={<Search />} />
         <Route path="/price-prediction" element={<PricePrediction />} />
+        <Route path="/community-reviews" element={<CommunityReviews />} />
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
           <Route path="/create-listing" element={<CreateListing />} />
@@ -40,6 +45,7 @@ function App() {
             path="/update-listing/:listingId"
             element={<UpdateListing />}
           />
+          <Route path="/create-review" element={<CreateReview />} />
         </Route>
       </Routes>
       <Footer />

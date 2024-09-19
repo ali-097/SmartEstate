@@ -5,6 +5,7 @@ import userRouter from "./routes/user.route.js";
 import authRouter from "./routes/auth.route.js";
 import listingRouter from "./routes/listing.route.js";
 import bidRouter from "./routes/bid.route.js";
+import reviewRouter from "./routes/review.route.js";
 import cookieParser from "cookie-parser";
 import path from "path";
 dotenv.config();
@@ -34,6 +35,7 @@ app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/listing", listingRouter);
 app.use("/api/bid", bidRouter);
+app.use("/api/review", reviewRouter);
 
 app.use(express.static(path.join(__dirname, "/client/dist")));
 
