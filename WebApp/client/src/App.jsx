@@ -32,9 +32,6 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />
-        <Route path="/my-listings" element={<MyListings />} />
-        <Route path="/my-bids" element={<MyBids />} />
-        <Route path="/my-reviews" element={<MyReviews />} />
         <Route path="/search" element={<Search />} />
         <Route path="/price-prediction" element={<PricePrediction />} />
         <Route path="/community-reviews" element={<CommunityReviews />} />
@@ -45,6 +42,9 @@ function App() {
             path="/update-listing/:listingId"
             element={<UpdateListing />}
           />
+          <Route path="/my-listings" element={<MyListings />} />
+          <Route path="/my-bids" element={<MyBids />} />
+          <Route path="/my-reviews" element={<MyReviews />} />
           <Route path="/create-review" element={<CreateReview />} />
         </Route>
       </Routes>
