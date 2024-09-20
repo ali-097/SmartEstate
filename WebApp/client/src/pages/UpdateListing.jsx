@@ -9,6 +9,7 @@ import {
 import { app } from "../firebase/firebase";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import CameraModal from "../components/CameraModal";
 
 export default function UpdateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -29,10 +30,23 @@ export default function UpdateListing() {
     parking: false,
     furnished: false,
   });
-  const [imageUploadError, setImageUploadError] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isCameraOpen, setCameraOpen] = useState(false);
+  const [capturedImages, setCapturedImages] = useState([]);
+
+  const handleOpenCamera = () => {
+    setCameraOpen(true);
+  };
+
+  const handleCaptureImage = async (blob) => {
+    const file = new File([blob], "photo.png", { type: "image/png" });
+    setFiles((prevFiles) => [...prevFiles, file]);
+    setCapturedImages((prevImages) => [
+      ...prevImages,
+      URL.createObjectURL(file),
+    ]);
+  };
 
   useEffect(() => {
     const fetchListing = async () => {
@@ -44,38 +58,39 @@ export default function UpdateListing() {
         return;
       }
       setFormData(data);
+      setCapturedImages(data.imageUrls);
     };
 
     fetchListing();
   }, []);
 
-  const handleImageSubmit = (e) => {
-    if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
-      setUploading(true);
-      setImageUploadError(false);
-      const promises = [];
+  // const handleImageSubmit = (e) => {
+  //   if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
+  //     setUploading(true);
+  //     setImageUploadError(false);
+  //     const promises = [];
 
-      for (let i = 0; i < files.length; i++) {
-        promises.push(storeImage(files[i]));
-      }
-      Promise.all(promises)
-        .then((urls) => {
-          setFormData({
-            ...formData,
-            imageUrls: formData.imageUrls.concat(urls),
-          });
-          setImageUploadError(false);
-          setUploading(false);
-        })
-        .catch((err) => {
-          setImageUploadError("Image upload failed (2 mb max per image)");
-          setUploading(false);
-        });
-    } else {
-      setImageUploadError("You can only upload 6 images per listing");
-      setUploading(false);
-    }
-  };
+  //     for (let i = 0; i < files.length; i++) {
+  //       promises.push(storeImage(files[i]));
+  //     }
+  //     Promise.all(promises)
+  //       .then((urls) => {
+  //         setFormData({
+  //           ...formData,
+  //           imageUrls: formData.imageUrls.concat(urls),
+  //         });
+  //         setImageUploadError(false);
+  //         setUploading(false);
+  //       })
+  //       .catch((err) => {
+  //         setImageUploadError("Image upload failed (2 mb max per image)");
+  //         setUploading(false);
+  //       });
+  //   } else {
+  //     setImageUploadError("You can only upload 6 images per listing");
+  //     setUploading(false);
+  //   }
+  // };
 
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
@@ -103,10 +118,12 @@ export default function UpdateListing() {
   };
 
   const handleRemoveImage = (index) => {
-    setFormData({
-      ...formData,
-      imageUrls: formData.imageUrls.filter((_, i) => i !== index),
-    });
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setCapturedImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    setFormData((prevData) => ({
+      ...prevData,
+      imageUrls: prevData.imageUrls.filter((_, i) => i !== index),
+    }));
   };
 
   const handleChange = (e) => {
@@ -143,12 +160,22 @@ export default function UpdateListing() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (formData.imageUrls.length < 1)
+      if (files.length + formData.imageUrls.length < 1)
         return setError("You must upload at least one image");
       if (+formData.regularPrice < +formData.discountPrice)
         return setError("Discount price must be lower than regular price");
+      if (files.length + formData.imageUrls.length > 6)
+        return setError("You can only upload 6 images per listing");
+      if (files.some((file) => file.size > 2 * 1024 * 1024))
+        return setError("Image upload failed (2 mb max per image)");
+
       setLoading(true);
       setError(false);
+
+      const imageUploadPromises = files.map((file) => storeImage(file));
+      const urls = await Promise.all(imageUploadPromises);
+      const allImageUrls = [...formData.imageUrls, ...urls];
+
       const res = await fetch(`/api/listing/update/${params.listingId}`, {
         method: "POST",
         headers: {
@@ -156,9 +183,11 @@ export default function UpdateListing() {
         },
         body: JSON.stringify({
           ...formData,
+          imageUrls: allImageUrls,
           userRef: currentUser._id,
         }),
       });
+
       const data = await res.json();
       setLoading(false);
       if (data.success === false) {
@@ -370,60 +399,53 @@ export default function UpdateListing() {
                 </span>
               </p>
               <div className="mt-4 flex gap-4">
+                <button
+                  type="button"
+                  onClick={handleOpenCamera}
+                  className="p-2 text-blue-700 border border-blue-700 rounded uppercase hover:shadow-lg"
+                >
+                  Take a Picture
+                </button>
                 <input
                   className="p-2 border border-gray-300 rounded w-full"
                   type="file"
                   id="images"
                   accept="image/*"
                   multiple
-                  onChange={(e) => setFiles(e.target.files)}
+                  onChange={(e) => {
+                    const filesArray = Array.from(e.target.files);
+                    setFiles((prevFiles) => [...prevFiles, ...filesArray]);
+                    setCapturedImages((prevImages) => [
+                      ...prevImages,
+                      ...filesArray.map((file) => URL.createObjectURL(file)),
+                    ]);
+                  }}
                 />
-                <button
-                  type="button"
-                  disabled={uploading}
-                  onClick={handleImageSubmit}
-                  className="p-2 text-green-700 border border-green-700 rounded uppercase hover:shadow-lg disabled:opacity-80"
-                >
-                  {uploading ? "Uploading..." : "Upload"}
-                </button>
               </div>
-              <p className="text-red-700 text-sm">
-                {imageUploadError && imageUploadError}
-              </p>
-              {formData.imageUrls.length > 0 &&
-                formData.imageUrls.map((url, index) => (
+              {capturedImages.length > 0 &&
+                capturedImages.map((url, index) => (
                   <div
-                    key={url}
+                    key={index}
                     className="mt-4 flex w-full justify-between p-2 border items-center"
                   >
                     <img
                       src={url}
-                      alt="listing image"
+                      alt="listing preview"
                       className="w-20 h-20 object-contain rounded-xl"
                     />
                     <button
                       type="button"
                       onClick={() => handleRemoveImage(index)}
-                      className="p-3 text-red-700 hover:opacity-75"
+                      className="p-1 text-red-700 hover:opacity-75"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 256 256"
-                      >
-                        <path
-                          fill="currentColor"
-                          d="M216 48h-40v-8a24 24 0 0 0-24-24h-48a24 24 0 0 0-24 24v8H40a8 8 0 0 0 0 16h8v144a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16V64h8a8 8 0 0 0 0-16ZM96 40a8 8 0 0 1 8-8h48a8 8 0 0 1 8 8v8H96Zm96 168H64V64h128Zm-80-104v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Zm48 0v64a8 8 0 0 1-16 0v-64a8 8 0 0 1 16 0Z"
-                        />
-                      </svg>
+                      Remove
                     </button>
                   </div>
                 ))}
             </div>
           </div>
           <button
-            disabled={loading || uploading}
+            disabled={loading}
             type="submit"
             className="flex w-6/12 m-auto justify-center rounded-md bg-myblue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
@@ -432,6 +454,11 @@ export default function UpdateListing() {
           {error && <p className="text-red-700 text-center text-sm">{error}</p>}
         </form>
       </section>
+      <CameraModal
+        isOpen={isCameraOpen}
+        onClose={() => setCameraOpen(false)}
+        onCapture={handleCaptureImage}
+      />
     </Helmet>
   );
 }
