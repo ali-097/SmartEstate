@@ -33,6 +33,10 @@ export default function CreateListing() {
   const [loading, setLoading] = useState(false);
   const [isCameraOpen, setCameraOpen] = useState(false);
   const [capturedImages, setCapturedImages] = useState([]);
+  const [verifiedWarning, setVerifiedWarning] = useState({
+    warningDisplayed: false,
+    showUpload: false,
+  });
 
   const handleOpenCamera = () => {
     setCameraOpen(true);
@@ -138,6 +142,8 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(location.coords.latitude, location.coords.longitude);
+
     try {
       if (files.length + formData.imageUrls.length < 1)
         return setError("You must upload at least one image");
@@ -393,8 +399,24 @@ export default function CreateListing() {
                 >
                   Take a Picture
                 </button>
+                <button
+                  type="button"
+                  className={`${
+                    verifiedWarning.showUpload ? "hidden" : "block"
+                  } p-2 text-blue-700 border border-blue-700 rounded uppercase hover:shadow-lg 
+                  `}
+                  onClick={() =>
+                    setVerifiedWarning({
+                      warningDisplayed: true,
+                    })
+                  }
+                >
+                  Upload Image
+                </button>
                 <input
-                  className="p-2 border border-gray-300 rounded w-full"
+                  className={`${
+                    verifiedWarning.showUpload ? "block" : "hidden"
+                  } p-2 border border-gray-300 rounded w-full`}
                   type="file"
                   id="images"
                   accept="image/*"
@@ -447,6 +469,27 @@ export default function CreateListing() {
         onClose={() => setCameraOpen(false)}
         onCapture={handleCaptureImage}
       />
+      {verifiedWarning.warningDisplayed && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded-lg ">
+            <p className="text-lg">
+              Note that uploading image will cause your property to be
+              unverified
+            </p>
+            <button
+              onClick={() => {
+                setVerifiedWarning({
+                  verifiedWarning: false,
+                  showUpload: true,
+                });
+              }}
+              className="mt-4 p-2 bg-red-700 text-white rounded-md hover:bg-red-600 cursor-pointer "
+            >
+              I understand
+            </button>
+          </div>
+        </div>
+      )}
     </Helmet>
   );
 }
