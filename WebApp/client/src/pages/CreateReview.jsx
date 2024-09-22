@@ -47,7 +47,7 @@ const CreateReview = () => {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/predict-sentiment", {
+      const response = await fetch("/modelsapi/predict-sentiment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

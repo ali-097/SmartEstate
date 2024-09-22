@@ -16,7 +16,7 @@ const PricePrediction = () => {
   const predictPrice = async (e) => {
     e.preventDefault();
     console.log(formDetails);
-    const response = await fetch("http://localhost:5000/predict-price", {
+    const response = await fetch("/modelsapi/predict-price", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

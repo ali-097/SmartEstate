@@ -142,7 +142,7 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(location.coords.latitude, location.coords.longitude);
+    // console.log(location.coords.latitude, location.coords.longitude);
 
     try {
       if (files.length + formData.imageUrls.length < 1)
