@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import Helmet from "../components/Helmet";
 import { useSelector } from "react-redux";
 import ContactLandlord from "../components/ContactLandlord";
+import DisplayLocation from "../components/DisplayLocation";
 
 const Listing = () => {
   const params = useParams();
@@ -49,6 +50,7 @@ const Listing = () => {
     fetchListing();
   }, [params.listingId]);
 
+  console.log(listing);
   return (
     <Helmet title={"Listing"}>
       <section className="listings">
@@ -135,13 +137,35 @@ const Listing = () => {
             <div className="py-10 max-w-7xl mx-auto px-4 lg:px-8 xl:max-w-full">
               <div className="flex flex-col gap-8 lg:flex-row lg:gap-16">
                 <div className="flex flex-col lg:w-6/12">
-                  <h3 className="text-xl font-semibold mb-3 md:text-2xl">
-                    {listing.name} - $
-                    {listing.offer
-                      ? listing.discountPrice.toLocaleString("en-US")
-                      : listing.regularPrice.toLocaleString("en-US")}
-                    {listing.type === "rent" && " / month"}
+                  <h3 className="text-xl font-semibold mb-3 md:text-2xl flex items-center">
+                    <span className="flex-1">
+                      {listing.name} - Rs{" "}
+                      {listing.offer
+                        ? listing.discountPrice.toLocaleString("en-US")
+                        : listing.regularPrice.toLocaleString("en-US")}
+                      {listing.type === "rent" && " / month"}
+                    </span>
+                    {/* <p className="text-sm text-gray-500">
+                      {listing.time && new Date(listing.time).toDateString()}
+                    </p> */}
+
+                    {listing.verified && (
+                      <span className="flex items-center bg-blue-50 text-blue-700 font-semibold text-xs px-3 py-1 rounded-full shadow-md border border-blue-200 ml-4">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          className="mr-1"
+                          fill="currentColor"
+                        >
+                          <path d="M12 0a12 12 0 100 24 12 12 0 000-24zm6 9l-8 8-4-4 1.414-1.414L10 14.586l6-6L18 9z" />
+                        </svg>
+                        <span className="whitespace-nowrap">Verified</span>
+                      </span>
+                    )}
                   </h3>
+
                   <div className="flex items-center gap-1 mb-3">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -155,6 +179,13 @@ const Listing = () => {
                       />
                     </svg>
                     <p className="text-base">{listing.address}</p>
+
+                    {listing.verified && (
+                      <p className="text-sm text-gray-500 ml-auto">
+                        Images Verified on{" "}
+                        {listing.time && new Date(listing.time).toDateString()}
+                      </p>
+                    )}
                   </div>
                   <div className="flex gap-4 mb-6">
                     <p className="bg-red-900 w-full max-w-[200px] text-white text-center p-1 rounded-md">
@@ -239,6 +270,12 @@ const Listing = () => {
                         {listing.furnished ? "Furnished" : "Unfurnished"}
                       </li>
                     </ul>
+                  </div>
+                  <div className="mt-4">
+                    <DisplayLocation
+                      location={listing.location}
+                      address={listing.address}
+                    />
                   </div>
                 </div>
                 <div className="flex flex-col items-center justify-center lg:border-l-[#DADFE5] lg:border-l lg:border-solid lg:w-6/12">

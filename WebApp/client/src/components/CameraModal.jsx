@@ -5,16 +5,23 @@ const CameraModal = ({ isOpen, onClose, onCapture }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (isOpen) {
-      const constraints = { video: true };
-      navigator.mediaDevices
-        .getUserMedia(constraints)
-        .then((stream) => {
+    const startCamera = async () => {
+      if (isOpen) {
+        const constraints = {
+          video: { facingMode: "environment" },
+        };
+
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
           videoRef.current.srcObject = stream;
           videoRef.current.play();
-        })
-        .catch((err) => console.error("Error accessing camera: ", err));
-    }
+        } catch (err) {
+          console.error("Error accessing camera: ", err);
+        }
+      }
+    };
+
+    startCamera();
   }, [isOpen]);
 
   const handleCapture = () => {

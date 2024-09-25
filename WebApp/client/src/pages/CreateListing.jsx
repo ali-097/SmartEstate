@@ -10,6 +10,7 @@ import { app } from "../firebase/firebase";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CameraModal from "../components/CameraModal";
+import MapComponent from "../components/MapComponent";
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -28,6 +29,9 @@ export default function CreateListing() {
     offer: false,
     parking: false,
     furnished: false,
+    verified: true,
+    time: "",
+    location: "",
   });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,6 +44,9 @@ export default function CreateListing() {
 
   const handleOpenCamera = () => {
     setCameraOpen(true);
+  };
+  const handleLocationSelect = (location) => {
+    setFormData((prev) => ({ ...prev, location }));
   };
 
   const handleCaptureImage = async (blob) => {
@@ -142,15 +149,49 @@ export default function CreateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log(location.coords.latitude, location.coords.longitude);
+
+    if (formData.verified) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setFormData((prevData) => ({
+              ...prevData,
+              location: `${position.coords.latitude},${position.coords.longitude}`,
+              time: new Date().toISOString().split("T")[0],
+            }));
+
+            // Call submitForm after setting the location
+            submitForm({
+              ...formData,
+              location: `${position.coords.latitude},${position.coords.longitude}`,
+              time: new Date().toISOString().split("T")[0],
+            });
+          },
+          (error) => {
+            // Handle geolocation error (optional)
+            setError("Unable to retrieve location");
+          }
+        );
+      } else {
+        // Handle the case where geolocation is not supported
+        setError("Geolocation is not supported by this browser.");
+      }
+    } else {
+      // If not verified, proceed with the submission without location
+      submitForm(formData);
+    }
+  };
+
+  const submitForm = async (formDataToSubmit) => {
+    console.log(formDataToSubmit);
 
     try {
-      if (files.length + formData.imageUrls.length < 1)
+      if (files.length + formDataToSubmit.imageUrls.length < 1)
         return setError("You must upload at least one image");
-      if (+formData.regularPrice < +formData.discountPrice)
+      if (+formDataToSubmit.regularPrice < +formDataToSubmit.discountPrice)
         return setError("Discount price must be lower than regular price");
       // only six images allowed
-      if (files.length + formData.imageUrls.length > 6)
+      if (files.length + formDataToSubmit.imageUrls.length > 6)
         return setError("You can only upload 6 images per listing");
       if (files.some((file) => file.size > 2 * 1024 * 1024))
         return setError("Image upload failed (2 mb max per image)");
@@ -163,7 +204,7 @@ export default function CreateListing() {
         imageUploadPromises.push(storeImage(file));
       }
 
-      for (const url of formData.imageUrls) {
+      for (const url of formDataToSubmit.imageUrls) {
         const file = await fetch(url).then((res) => res.blob());
         imageUploadPromises.push(storeImage(file));
       }
@@ -175,7 +216,7 @@ export default function CreateListing() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...formData,
+          ...formDataToSubmit,
           imageUrls: urls,
           userRef: currentUser._id,
         }),
@@ -383,6 +424,26 @@ export default function CreateListing() {
                   </div>
                 )}
               </div>
+              {verifiedWarning.showUpload && (
+                <div className="mt-6 bg-white rounded-lg p-6 shadow-md border border-gray-200">
+                  <h3 className="text-2xl font-bold text-grey-700 mb-3">
+                    Set Your Property Location
+                  </h3>
+                  <div className="flex items-center mb-3">
+                    <span className="text-lg text-gray-700 mr-2">📍</span>
+                    <span className="text-md text-gray-600">
+                      Click on the map to mark your property. Drag the marker to
+                      adjust.
+                    </span>
+                  </div>
+                  <div className="h-64 w-full rounded-lg overflow-hidden border border-gray-300 shadow-lg">
+                    <MapComponent onLocationSelect={handleLocationSelect} />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Use zoom and pan for precise placement.
+                  </p>
+                </div>
+              )}
             </div>
             <div className="flex flex-col p-2 items-center justify-center bg-gray-50 rounded-md lg:w-6/12">
               <p className="font-semibold">
@@ -481,6 +542,10 @@ export default function CreateListing() {
                 setVerifiedWarning({
                   verifiedWarning: false,
                   showUpload: true,
+                });
+                setFormData({
+                  ...formData,
+                  verified: false,
                 });
               }}
               className="mt-4 p-2 bg-red-700 text-white rounded-md hover:bg-red-600 cursor-pointer "
