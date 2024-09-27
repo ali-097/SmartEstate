@@ -58,34 +58,6 @@ export default function CreateListing() {
     ]);
   };
 
-  // const handleImageSubmit = (e) => {
-  //   if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
-  //     setUploading(true);
-  //     setImageUploadError(false);
-  //     const promises = [];
-
-  //     for (let i = 0; i < files.length; i++) {
-  //       promises.push(storeImage(files[i]));
-  //     }
-  //     Promise.all(promises)
-  //       .then((urls) => {
-  //         setFormData({
-  //           ...formData,
-  //           imageUrls: formData.imageUrls.concat(urls),
-  //         });
-  //         setImageUploadError(false);
-  //         setUploading(false);
-  //       })
-  //       .catch((err) => {
-  //         setImageUploadError("Image upload failed (2 mb max per image)");
-  //         setUploading(false);
-  //       });
-  //   } else {
-  //     setImageUploadError("You can only upload 6 images per listing");
-  //     setUploading(false);
-  //   }
-  // };
-
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
       const storage = getStorage(app);
@@ -159,8 +131,6 @@ export default function CreateListing() {
               location: `${position.coords.latitude},${position.coords.longitude}`,
               time: new Date().toISOString().split("T")[0],
             }));
-
-            // Call submitForm after setting the location
             submitForm({
               ...formData,
               location: `${position.coords.latitude},${position.coords.longitude}`,
@@ -168,33 +138,29 @@ export default function CreateListing() {
             });
           },
           (error) => {
-            // Handle geolocation error (optional)
             setError("Unable to retrieve location");
           }
         );
       } else {
-        // Handle the case where geolocation is not supported
         setError("Geolocation is not supported by this browser.");
       }
     } else {
-      // If not verified, proceed with the submission without location
       submitForm(formData);
     }
   };
 
   const submitForm = async (formDataToSubmit) => {
-    console.log(formDataToSubmit);
-
     try {
       if (files.length + formDataToSubmit.imageUrls.length < 1)
         return setError("You must upload at least one image");
       if (+formDataToSubmit.regularPrice < +formDataToSubmit.discountPrice)
         return setError("Discount price must be lower than regular price");
-      // only six images allowed
-      if (files.length + formDataToSubmit.imageUrls.length > 6)
-        return setError("You can only upload 6 images per listing");
+      if (files.length + formDataToSubmit.imageUrls.length > 10)
+        return setError("You can only upload 10 images per listing");
       if (files.some((file) => file.size > 2 * 1024 * 1024))
         return setError("Image upload failed (2 mb max per image)");
+      if (formDataToSubmit.location === "")
+        return setError("Please set your property location");
 
       setLoading(true);
       setError(false);

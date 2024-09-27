@@ -10,6 +10,7 @@ import { app } from "../firebase/firebase";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import CameraModal from "../components/CameraModal";
+import MapComponent from "../components/MapComponent";
 
 export default function UpdateListing() {
   const { currentUser } = useSelector((state) => state.user);
@@ -29,6 +30,9 @@ export default function UpdateListing() {
     offer: false,
     parking: false,
     furnished: false,
+    verified: true,
+    time: "",
+    location: "",
   });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -37,6 +41,10 @@ export default function UpdateListing() {
 
   const handleOpenCamera = () => {
     setCameraOpen(true);
+  };
+
+  const handleLocationSelect = (location) => {
+    setFormData((prev) => ({ ...prev, location }));
   };
 
   const handleCaptureImage = async (blob) => {
@@ -63,34 +71,6 @@ export default function UpdateListing() {
 
     fetchListing();
   }, []);
-
-  // const handleImageSubmit = (e) => {
-  //   if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
-  //     setUploading(true);
-  //     setImageUploadError(false);
-  //     const promises = [];
-
-  //     for (let i = 0; i < files.length; i++) {
-  //       promises.push(storeImage(files[i]));
-  //     }
-  //     Promise.all(promises)
-  //       .then((urls) => {
-  //         setFormData({
-  //           ...formData,
-  //           imageUrls: formData.imageUrls.concat(urls),
-  //         });
-  //         setImageUploadError(false);
-  //         setUploading(false);
-  //       })
-  //       .catch((err) => {
-  //         setImageUploadError("Image upload failed (2 mb max per image)");
-  //         setUploading(false);
-  //       });
-  //   } else {
-  //     setImageUploadError("You can only upload 6 images per listing");
-  //     setUploading(false);
-  //   }
-  // };
 
   const storeImage = async (file) => {
     return new Promise((resolve, reject) => {
@@ -159,13 +139,42 @@ export default function UpdateListing() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.verified) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log(position.coords.latitude, position.coords.longitude);
+            setFormData((prevData) => ({
+              ...prevData,
+              location: `${position.coords.latitude},${position.coords.longitude}`,
+              time: new Date().toISOString().split("T")[0],
+            }));
+            submitForm({
+              ...formData,
+              location: `${position.coords.latitude},${position.coords.longitude}`,
+              time: new Date().toISOString().split("T")[0],
+            });
+          },
+          (error) => {
+            setError("Unable to retrieve location");
+          }
+        );
+      } else {
+        setError("Geolocation is not supported by this browser.");
+      }
+    } else {
+      submitForm(formData);
+    }
+  };
+
+  const submitForm = async (formDataToSubmit) => {
     try {
       if (files.length + formData.imageUrls.length < 1)
         return setError("You must upload at least one image");
       if (+formData.regularPrice < +formData.discountPrice)
         return setError("Discount price must be lower than regular price");
-      if (files.length + formData.imageUrls.length > 6)
-        return setError("You can only upload 6 images per listing");
+      if (files.length + formData.imageUrls.length > 10)
+        return setError("You can only upload 10 images per listing");
       if (files.some((file) => file.size > 2 * 1024 * 1024))
         return setError("Image upload failed (2 mb max per image)");
 
@@ -182,7 +191,7 @@ export default function UpdateListing() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...formData,
+          ...formDataToSubmit,
           imageUrls: allImageUrls,
           userRef: currentUser._id,
         }),
@@ -194,6 +203,7 @@ export default function UpdateListing() {
         setError(data.message);
       }
       navigate(`/listing/${data._id}`);
+      console.log(formData);
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -390,6 +400,26 @@ export default function UpdateListing() {
                   </div>
                 )}
               </div>
+              {!formData.verified && (
+                <div className="mt-6 bg-white rounded-lg p-6 shadow-md border border-gray-200">
+                  <h3 className="text-2xl font-bold text-grey-700 mb-3">
+                    Set Your Property Location
+                  </h3>
+                  <div className="flex items-center mb-3">
+                    <span className="text-lg text-gray-700 mr-2">📍</span>
+                    <span className="text-md text-gray-600">
+                      Click on the map to mark your property. Drag the marker to
+                      adjust.
+                    </span>
+                  </div>
+                  <div className="h-64 w-full rounded-lg overflow-hidden border border-gray-300 shadow-lg">
+                    <MapComponent onLocationSelect={handleLocationSelect} />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Use zoom and pan for precise placement.
+                  </p>
+                </div>
+              )}
             </div>
             <div className="flex flex-col p-2 items-center justify-center bg-gray-50 rounded-md lg:w-6/12">
               <p className="font-semibold">
@@ -406,21 +436,23 @@ export default function UpdateListing() {
                 >
                   Take a Picture
                 </button>
-                <input
-                  className="p-2 border border-gray-300 rounded w-full"
-                  type="file"
-                  id="images"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const filesArray = Array.from(e.target.files);
-                    setFiles((prevFiles) => [...prevFiles, ...filesArray]);
-                    setCapturedImages((prevImages) => [
-                      ...prevImages,
-                      ...filesArray.map((file) => URL.createObjectURL(file)),
-                    ]);
-                  }}
-                />
+                {!formData.verified && (
+                  <input
+                    className="p-2 border border-gray-300 rounded w-full"
+                    type="file"
+                    id="images"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      const filesArray = Array.from(e.target.files);
+                      setFiles((prevFiles) => [...prevFiles, ...filesArray]);
+                      setCapturedImages((prevImages) => [
+                        ...prevImages,
+                        ...filesArray.map((file) => URL.createObjectURL(file)),
+                      ]);
+                    }}
+                  />
+                )}
               </div>
               {capturedImages.length > 0 &&
                 capturedImages.map((url, index) => (

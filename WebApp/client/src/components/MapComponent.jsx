@@ -42,7 +42,7 @@ function MyMapComponent({ onLocationSelect }) {
     <MapContainer
       center={[33.6995, 73.0363]}
       zoom={13}
-      className="h-64 w-full rounded-lg overflow-hidden border border-gray-300 shadow-lg"
+      className="h-64 w-full rounded-lg overflow-hidden border border-gray-300 shadow-lg z-0"
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

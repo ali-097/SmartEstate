@@ -1,7 +1,7 @@
 {
-  "name": "casacrest-app",
+  "name": "smartestate-app",
   "version": "1.0.0",
-  "description": "CasaCrest - Real Estate App",
+  "description": "SmartEstate - Real Estate App",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mde3/casa-crest.git"
+    "url": "git+https://github.com/ali-097/SmartEstate.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mde3/casa-crest/issues"
+    "url": "https://github.com/ali-097/SmartEstate/issues"
   },
-  "homepage": "https://github.com/mde3/casa-crest#readme",
+  "homepage": "https://github.com/ali-097/SmartEstate#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",

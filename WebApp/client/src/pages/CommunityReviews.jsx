@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Helmet from "../components/Helmet";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const CommunityReviews = () => {
+  const navigate = useNavigate();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -83,6 +85,14 @@ const CommunityReviews = () => {
             <h3 className="text-2xl font-semibold mb-5 text-center text-gray-800">
               Community Reviews
             </h3>
+            <div className="flex justify-center mb-6">
+              <button
+                onClick={() => navigate("/create-review")}
+                className="bg-indigo-600 text-white font-bold py-2 px-4 rounded-md hover:bg-indigo-700"
+              >
+                Create Review
+              </button>
+            </div>
 
             <div className="flex flex-col items-center md:flex-row md:justify-center mb-8 gap-4">
               <input

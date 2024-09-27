@@ -27,12 +27,14 @@ const Profile = () => {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [totalBids, setTotalBids] = useState(0);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
     }
+    fetchTotalBids();
   }, [file]);
 
   const handleFileUpload = (file) => {
@@ -127,6 +129,16 @@ const Profile = () => {
     }
   };
 
+  const fetchTotalBids = async () => {
+    try {
+      const res = await fetch(`/api/user/bids/${currentUser._id}`);
+      const data = await res.json();
+      setTotalBids(data.length);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Helmet title={"Profile"}>
       <section className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
@@ -151,13 +163,13 @@ const Profile = () => {
                   onClick={() => fileRef.current.click()}
                   src={formData.avatar || currentUser.avatar}
                   alt="profile"
-                  className="rounded-full h-24 w-24 object-cover cursor-pointer mb-2"
+                  className="rounded-full h-28 w-28 object-cover cursor-pointer mb-2 border-4 border-gray-200 shadow-lg"
                 />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="30"
                   height="30"
-                  className="absolute bottom-0 left-15 cursor-pointer"
+                  className="absolute bottom-0 right-0 cursor-pointer"
                   viewBox="0 0 24 24"
                 >
                   <path
@@ -292,7 +304,7 @@ const Profile = () => {
               to={"/my-bids"}
               className="mt-4 bg-gradient-to-r from-blue-500 via-blue-300 to-blue-500 flex items-center gap-2 w-full justify-center rounded-md bg-gray-100 px-3 py-1.5"
             >
-              View your Bids
+              View your Bids ({totalBids})
             </Link>
           </div>
           <div
