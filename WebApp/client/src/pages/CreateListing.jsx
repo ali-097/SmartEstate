@@ -41,6 +41,13 @@ export default function CreateListing() {
     warningDisplayed: false,
     showUpload: false,
   });
+  const [address, setAddress] = useState({
+    house: "",
+    street: "",
+    area: "",
+    city: "",
+  });
+  const cities = ["Islamabad", "Lahore", "Karachi"];
 
   const handleOpenCamera = () => {
     setCameraOpen(true);
@@ -185,6 +192,7 @@ export default function CreateListing() {
           ...formDataToSubmit,
           imageUrls: urls,
           userRef: currentUser._id,
+          address: `House No: ${address.house}, Street No: ${address.street}, ${address.area}, ${address.city}`,
         }),
       });
 
@@ -256,15 +264,84 @@ export default function CreateListing() {
                 >
                   Address
                 </label>
-                <div>
-                  <input
-                    type="text"
-                    id="address"
-                    required
-                    onChange={handleChange}
-                    value={formData.address}
-                    className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
+                <div className="flex flex-wrap">
+                  <div className="w-full sm:w-1/2 pr-2">
+                    <input
+                      type="text"
+                      id="house"
+                      required
+                      onChange={(e) =>
+                        setAddress({ ...address, house: e.target.value })
+                      }
+                      value={address.house}
+                      placeholder="House"
+                      className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                  <div className="w-full sm:w-1/2 pl-2">
+                    <input
+                      type="text"
+                      id="street"
+                      required
+                      onChange={(e) =>
+                        setAddress({ ...address, street: e.target.value })
+                      }
+                      value={address.street}
+                      placeholder="Street"
+                      className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-wrap mt-4">
+                  <div className="w-full sm:w-3/5 pr-2">
+                    <input
+                      type="text"
+                      id="area"
+                      required
+                      onChange={(e) =>
+                        setAddress({ ...address, area: e.target.value })
+                      }
+                      value={address.area}
+                      placeholder="Area"
+                      className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                  <div className="w-full sm:w-2/5 pl-2 mb-4">
+                    <select
+                      id="city"
+                      required
+                      onChange={(e) =>
+                        setAddress({ ...address, city: e.target.value })
+                      }
+                      value={address.city}
+                      className="block w-full rounded-lg border border-gray-300 bg-white shadow-sm py-2.5 px-4 text-gray-900 placeholder:text-gray-400 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150 ease-in-out"
+                    >
+                      <option value="" disabled>
+                        Select a city
+                      </option>
+                      {cities.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg
+                        className="w-5 h-5 text-gray-400"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="mt-4 flex flex-wrap gap-4">

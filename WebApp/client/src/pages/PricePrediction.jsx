@@ -24,8 +24,8 @@ const PricePrediction = () => {
       body: JSON.stringify(formDetails),
     });
     const data = await response.json();
-    console.log(data);
-    setPrice(data.predicted_price);
+    console.log((data.predicted_price * 371.31) / 183.54);
+    setPrice((data.predicted_price * 371.31) / 183.54);
   };
 
   const handleChange = (e) => {

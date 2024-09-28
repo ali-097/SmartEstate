@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^3.11.0",
+    "@ramonak/react-progress-bar": "^5.3.0",
     "@reduxjs/toolkit": "^1.9.7",
     "autoprefixer": "^10.4.16",
     "firebase": "^10.5.0",
