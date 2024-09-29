@@ -1,9 +1,16 @@
 import Bid from "../models/bid.model.js";
 import { errorHandler } from "../utils/error.js";
+import User from "../models/user.model.js";
+import { sendBidEmail } from "../utils/mailer.js";
 
+// send email to user when bid is created
 export const createBid = async (req, res, next) => {
   try {
     const bid = await Bid.create(req.body);
+    const user = await User.findById(bid.userRef);
+    if (user) {
+      await sendBidEmail(user.email, bid);
+    }
     return res.status(201).json(bid);
   } catch (error) {
     next(error);

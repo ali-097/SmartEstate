@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// import { Link } from "react-router-dom";
 
 export default function ContactLandlord({ listing, email, setContact }) {
   const [landlord, setLandlord] = useState(null);
@@ -12,6 +11,7 @@ export default function ContactLandlord({ listing, email, setContact }) {
     message: "",
   });
   const [bidSent, setBidSent] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const onChange = (e) => {
     setBid({ ...bid, [e.target.name]: e.target.value });
@@ -33,6 +33,7 @@ export default function ContactLandlord({ listing, email, setContact }) {
 
   const submitBid = async (e) => {
     e.preventDefault();
+    setLoading(true);
     if (bid.occupants === "") {
       bid.occupants = -1;
     }
@@ -52,6 +53,7 @@ export default function ContactLandlord({ listing, email, setContact }) {
         }),
       });
       const data = await res.json();
+      setLoading(false);
       console.log(data);
     } catch (error) {
       console.log(bid);
@@ -73,15 +75,6 @@ export default function ContactLandlord({ listing, email, setContact }) {
             Contact <span className="font-semibold">{landlord.username}</span>{" "}
             for <span className="font-semibold capitalize">{listing.name}</span>
           </p>
-          {/* <textarea
-            type="text"
-            id="message"
-            name="message"
-            rows="2"
-            onChange={onChange}
-            placeholder="Enter your message here..."
-            className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          /> */}
           <form className="flex flex-col gap-2" onSubmit={submitBid}>
             <input
               type="text"
@@ -103,7 +96,7 @@ export default function ContactLandlord({ listing, email, setContact }) {
               required
             />
             <input
-              type="tel"
+              type="number"
               id="phone"
               name="phone"
               onChange={onChange}
@@ -141,24 +134,54 @@ export default function ContactLandlord({ listing, email, setContact }) {
               className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
             <button
-              // to={`mailto:${landlord.email}?subject=Regarding ${listing.name}&body=${bid}`}
-              className="flex justify-center items-center gap-2 rounded-md bg-myblue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              type="submit"
+              className={`flex justify-center items-center gap-2 rounded-md bg-myblue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 ${
+                loading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={loading}
             >
-              Send Message
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-              >
-                <path fill="currentColor" d="M3 20v-6l8-2l-8-2V4l19 8l-19 8Z" />
-              </svg>
+              {loading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v2a6 6 0 00-6 6H4z"
+                    />
+                  </svg>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  Send Message
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M3 20v-6l8-2l-8-2V4l19 8l-19 8Z"
+                    />
+                  </svg>
+                </>
+              )}
             </button>
           </form>
-          {/* <Link
-            to={`mailto:${landlord.email}?subject=Regarding ${listing.name}&body=${bid}`}
-            className="flex justify-center items-center gap-2 rounded-md bg-myblue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          > */}
           {bidSent && (
             <p className="flex justify-center items-center text-green-600 mt-2">
               Bid sent successfully!
