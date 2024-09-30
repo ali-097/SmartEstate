@@ -28,6 +28,7 @@ const Search = () => {
     const offerFromUrl = urlParams.get("offer");
     const sortFromUrl = urlParams.get("sort");
     const orderFromUrl = urlParams.get("order");
+    const verifiedFromUrl = urlParams.get("version");
 
     if (
       searchTermFromUrl ||
@@ -36,7 +37,8 @@ const Search = () => {
       furnishedFromUrl ||
       offerFromUrl ||
       sortFromUrl ||
-      orderFromUrl
+      orderFromUrl ||
+      verifiedFromUrl
     ) {
       setSidebardata({
         searchTerm: searchTermFromUrl || "",
@@ -46,6 +48,7 @@ const Search = () => {
         offer: offerFromUrl === "true" ? true : false,
         sort: sortFromUrl || "created_at",
         order: orderFromUrl || "desc",
+        verified: verifiedFromUrl === "true" ? true : false,
       });
     }
 
@@ -92,6 +95,14 @@ const Search = () => {
       });
     }
 
+    if (e.target.id === "verified") {
+      setSidebardata({
+        ...sidebardata,
+        verified:
+          e.target.checked || e.target.checked === "true" ? true : false,
+      });
+    }
+
     if (e.target.id === "sort_order") {
       const sort = e.target.value.split("_")[0] || "created_at";
 
@@ -111,6 +122,7 @@ const Search = () => {
     urlParams.set("offer", sidebardata.offer);
     urlParams.set("sort", sidebardata.sort);
     urlParams.set("order", sidebardata.order);
+    urlParams.set("verified", sidebardata.verified);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };
@@ -235,6 +247,20 @@ const Search = () => {
                         />
                         <label className="w-full py-2 ms-2 text-base font-medium text-gray-900">
                           Furnished
+                        </label>
+                      </div>
+                    </li>
+                    <li className="w-full">
+                      <div className="flex items-center ps-3">
+                        <input
+                          type="checkbox"
+                          id="verified"
+                          onChange={handleChange}
+                          checked={sidebardata.verified}
+                          className="w-4 h-4 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-600 ring-offset-gray-700 focus:ring-offset-gray-700 focus:ring-2"
+                        />
+                        <label className="w-full py-2 ms-2 text-base font-medium text-gray-900">
+                          Verified
                         </label>
                       </div>
                     </li>
