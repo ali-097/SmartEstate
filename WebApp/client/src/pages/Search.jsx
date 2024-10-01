@@ -13,6 +13,7 @@ const Search = () => {
     offer: false,
     sort: "created_at",
     order: "desc",
+    verified: false,
   });
 
   const [loading, setLoading] = useState(false);
@@ -28,7 +29,7 @@ const Search = () => {
     const offerFromUrl = urlParams.get("offer");
     const sortFromUrl = urlParams.get("sort");
     const orderFromUrl = urlParams.get("order");
-    const verifiedFromUrl = urlParams.get("version");
+    const verifiedFromUrl = urlParams.get("verified");
 
     if (
       searchTermFromUrl ||
