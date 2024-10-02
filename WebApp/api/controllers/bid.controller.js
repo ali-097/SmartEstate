@@ -9,7 +9,7 @@ export const createBid = async (req, res, next) => {
     const bid = await Bid.create(req.body);
     const user = await User.findById(bid.userRef);
     if (user) {
-      await sendBidEmail(user.email, bid);
+      await sendBidEmail(user.email, bid, true);
     }
     return res.status(201).json(bid);
   } catch (error) {
@@ -41,8 +41,17 @@ export const updateBid = async (req, res, next) => {
   if (!bid) {
     return next(errorHandler(404, "Bid not found!"));
   }
-  if (req.user.id !== bid.bidderRef) {
-    return next(errorHandler(401, "You can only update your own bids!"));
+  // if (req.user.id !== bid.bidderRef || req.user.id !== bid.userRef) {
+  //   return next(errorHandler(401, "You can only update your own bids!"));
+  // }
+
+  const keys = Object.keys(req.body);
+
+  if (keys.length === 1 && keys.includes("accepted")) {
+    const user = await User.findById(bid.bidderRef);
+    if (user) {
+      await sendBidEmail(user.email, bid, false);
+    }
   }
   try {
     const updatedBid = await Bid.findByIdAndUpdate(req.params.id, req.body, {

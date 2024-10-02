@@ -105,7 +105,7 @@ const BidModal = ({ isOpen, onClose, bid, onSubmit }) => {
               value={formData.occupants}
               onChange={handleChange}
               min="1"
-              placeholder="Occupants"
+              placeholder="Occupants (optional)"
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
           </div>
@@ -117,7 +117,7 @@ const BidModal = ({ isOpen, onClose, bid, onSubmit }) => {
               name="message"
               value={formData.message}
               onChange={handleChange}
-              placeholder="Message"
+              placeholder="Message (optional)"
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm px-3 py-2 focus:outline-none focus:ring focus:ring-blue-500"
             />
           </div>
