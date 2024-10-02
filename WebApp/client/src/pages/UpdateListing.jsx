@@ -44,7 +44,13 @@ export default function UpdateListing() {
     area: "",
     city: "",
   });
+  const [isPopoverOpen, setPopoverOpen] = useState(false);
+
   const cities = ["Islamabad", "Lahore", "Karachi"];
+
+  const togglePopover = () => {
+    setPopoverOpen(!isPopoverOpen);
+  };
 
   const handleOpenCamera = () => {
     setCameraOpen(true);
@@ -233,6 +239,41 @@ export default function UpdateListing() {
           <h2 className="text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
             Update Listing
           </h2>
+          {/* show status of property verified or not (green/red) and put an info sign next to it telling that status cant be changed using popover */}
+          <div className="relative flex items-center justify-center mt-4">
+            <span className="text-sm font-semibold text-gray-600">Status:</span>
+            <span
+              className={`text-sm font-semibold ml-2 px-2 py-1 rounded-full ${
+                formData.verified
+                  ? "bg-green-500 text-white"
+                  : "bg-red-500 text-white"
+              }`}
+            >
+              {formData.verified ? "Verified" : "Not Verified"}
+            </span>
+            <div className="ml-2">
+              <button
+                onClick={togglePopover}
+                className="text-gray-500 focus:outline-none"
+                aria-label="More info"
+              >
+                ⓘ
+              </button>
+              {isPopoverOpen && (
+                <div className="absolute z-10 bg-gradient-to-r from-blue-100 to-blue-200 text-gray-800 p-4 rounded-lg border border-blue-300 shadow-lg mt-1 transition-all duration-300 ease-in-out">
+                  <p className="text-sm mb-2">
+                    The verification status cannot be changed.
+                  </p>
+                  <button
+                    onClick={togglePopover}
+                    className="bg-blue-600 text-white font-semibold px-3 py-1 rounded-lg shadow hover:bg-blue-500 transition-colors duration-200 focus:outline-none"
+                  >
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex flex-col lg:flex-row gap-4">
@@ -282,8 +323,8 @@ export default function UpdateListing() {
                 >
                   Address
                 </label>
-                <div className="flex flex-wrap">
-                  <div className="w-full sm:w-1/2 pr-2">
+                <div className="flex flex-wrap -mx-2 ">
+                  <div className="w-full sm:w-1/2 px-2 mb-4 sm:mb-0">
                     <input
                       type="text"
                       id="house"
@@ -296,7 +337,7 @@ export default function UpdateListing() {
                       className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
-                  <div className="w-full sm:w-1/2 pl-2">
+                  <div className="w-full sm:w-1/2 px-2">
                     <input
                       type="text"
                       id="street"
@@ -310,8 +351,8 @@ export default function UpdateListing() {
                     />
                   </div>
                 </div>
-                <div className="flex flex-wrap mt-4">
-                  <div className="w-full sm:w-3/5 pr-2">
+                <div className="flex flex-wrap mt-4 -mx-2">
+                  <div className="w-full sm:w-3/5 px-2 mb-4 sm:mb-0">
                     <input
                       type="text"
                       id="area"
@@ -324,7 +365,7 @@ export default function UpdateListing() {
                       className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
-                  <div className="w-full sm:w-2/5 pl-2 mb-4">
+                  <div className="w-full sm:w-2/5 px-2 mb-4 relative">
                     <select
                       id="city"
                       required
@@ -458,7 +499,7 @@ export default function UpdateListing() {
                     <div className="flex flex-col items-center">
                       <p>Regular price</p>
                       {formData.type === "rent" && (
-                        <span className="text-xs">($ / month)</span>
+                        <span className="text-xs">(Rs / month)</span>
                       )}
                     </div>
                   </div>

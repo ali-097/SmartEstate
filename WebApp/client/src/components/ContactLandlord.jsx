@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function ContactLandlord({ listing, email, setContact }) {
+  const { currentUser } = useSelector((state) => state.user);
   const [landlord, setLandlord] = useState(null);
   const [bid, setBid] = useState({
     name: "",
@@ -50,6 +52,8 @@ export default function ContactLandlord({ listing, email, setContact }) {
           ...bid,
           listingRef: listing._id,
           userRef: listing.userRef,
+          accepted: false,
+          bidderRef: currentUser._id,
         }),
       });
       const data = await res.json();

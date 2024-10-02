@@ -34,6 +34,14 @@ const bidSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    accepted: {
+      type: Boolean,
+      required: true,
+    },
+    bidderRef: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );

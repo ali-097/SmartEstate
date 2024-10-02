@@ -1,14 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Helmet from "../components/Helmet";
-import Listing from "./Listing";
+import BidModal from "../components/BidModal";
 
 const MyBids = () => {
   const { currentUser } = useSelector((state) => state.user);
-  const [showBidsError, setShowBidsError] = useState(false);
+  const [showBidsError, setShowBidsError] = useState("");
   const [userBids, setUserBids] = useState([]);
+  const [sentBids, setSentBids] = useState([]);
   const [listings, setListings] = useState({});
+  const [bidType, setBidType] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBid, setSelectedBid] = useState(null);
+
+  useEffect(() => {
+    handleShowBids();
+    // handlegetBids();
+  }, []);
+
+  const handleEditClick = (bid) => {
+    setSelectedBid(bid);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedBid(null);
+  };
 
   const handleShowBids = async () => {
     try {
@@ -16,16 +35,43 @@ const MyBids = () => {
       const res = await fetch(`/api/user/bids/${currentUser._id}`);
       const data = await res.json();
 
-      if (data.success === false) {
-        setShowBidsError(true);
+      if (data.length === 0) {
+        setShowBidsError("No bids found.");
         return;
       }
 
+      if (data.success === false) {
+        setShowBidsError("Could not load bids. Please try again later.");
+        return;
+      }
       setUserBids(data);
+      setBidType(1);
       await fetchListings(data);
-      console.log(data);
+      // console.log(data);
     } catch (error) {
-      setShowBidsError(true);
+      setShowBidsError("Could not load bids. Please try again later.");
+    }
+  };
+
+  const handlegetBids = async () => {
+    try {
+      setShowBidsError(false);
+      // console.log(currentUser._id);
+      const res = await fetch(`/api/bid/sent/${currentUser._id}`);
+      const data = await res.json();
+      if (data.success === false) {
+        setShowBidsError("Could not load bids. Please try again later.");
+        return;
+      }
+      if (data.length === 0) {
+        setShowBidsError("No bids found.");
+        return;
+      }
+      setSentBids(data);
+      setBidType(2);
+      await fetchListings(data);
+    } catch (error) {
+      setShowBidsError("Could not load bids. Please try again later.");
     }
   };
 
@@ -35,7 +81,7 @@ const MyBids = () => {
       const listing = await getListing(bid.listingRef);
       fetchedListings[bid.listingRef] = listing;
     }
-    setListings(fetchedListings); // Update state with full listing data
+    setListings(fetchedListings);
   };
 
   const handleBidDelete = async (bidId) => {
@@ -55,6 +101,59 @@ const MyBids = () => {
     }
   };
 
+  const handleBidAccept = async (bidId) => {
+    try {
+      const res = await fetch(`/api/bid/update/${bidId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ accepted: true }),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+
+      setUserBids((prev) =>
+        prev.map((bid) =>
+          bid._id === bidId ? { ...bid, accepted: true } : bid
+        )
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const handleBidUpdate = async (updatedBid) => {
+    if (updatedBid.occupants === "") updatedBid.occupants = -1;
+    if (updatedBid.message === "") updatedBid.message = "Not specified";
+
+    try {
+      const res = await fetch(`/api/bid/update/${updatedBid._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedBid),
+      });
+      const data = await res.json();
+      setSentBids((prev) =>
+        prev.map((bid) => (bid._id === updatedBid._id ? updatedBid : bid))
+      );
+      if (data.success) {
+        // Update the userBids state to reflect the modified bid
+        console.log("Bid updated successfully");
+      } else {
+        console.log(data.message);
+      }
+      // update the bid in the userBids state
+    } catch (error) {
+      console.log("Error updating bid:", error.message);
+    }
+  };
+
   const getListing = async (listingId) => {
     try {
       const res = await fetch(`/api/listing/get/${listingId}`);
@@ -63,7 +162,7 @@ const MyBids = () => {
       return data;
     } catch (error) {
       console.log(error.message);
-      return { name: "Unknown Listing" }; // Fallback in case of error
+      return { name: "Unknown Listing" };
     }
   };
 
@@ -78,19 +177,36 @@ const MyBids = () => {
           </div>
 
           <div className="mt-4 sm:mx-auto sm:w-full sm:max-w-sm md:max-w-md lg:max-w-lg">
-            <div className="space-y-6">
+            <div className="flex justify-center gap-4">
               <button
                 onClick={handleShowBids}
-                className="bg-green-600 text-white font-bold py-2 px-4 rounded w-full hover:bg-green-700"
+                className={`${
+                  bidType === 1
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-900"
+                } px-4 py-2 rounded-md font-medium`}
               >
-                Click here to Show Bids
+                Received Bids
               </button>
-              <p className="text-red-700 mt-5">
-                {showBidsError &&
-                  "Could not load bids. Please try again later."}
-              </p>
+              <button
+                onClick={handlegetBids}
+                className={`${
+                  bidType === 2
+                    ? "bg-blue-600 text-white"
+                    : "bg-white text-gray-900"
+                } px-4 py-2 rounded-md font-medium`}
+              >
+                Sent Bids
+              </button>
+            </div>
+
+            <div className="mt-6">
+              {showBidsError && (
+                <div className="text-red-600 text-center">{showBidsError}</div>
+              )}
 
               {userBids.length > 0 &&
+                bidType === 1 &&
                 userBids.map((bid) => (
                   <div
                     key={bid._id}
@@ -102,6 +218,12 @@ const MyBids = () => {
                         <h3 className="text-xl font-semibold text-gray-900">
                           {listings[bid.listingRef]?.name || "Loading..."}
                         </h3>
+
+                        {bid.accepted && (
+                          <div className="bg-green-100 text-green-800 px-2 py-1 rounded-md text-sm">
+                            Accepted
+                          </div>
+                        )}
                       </div>
                       <div className="text-sm text-gray-500 mt-2">
                         <p>{listings[bid.listingRef]?.type || "Loading..."}</p>
@@ -170,12 +292,140 @@ const MyBids = () => {
                       >
                         View Listing
                       </Link>
-                      <button
-                        onClick={() => handleBidDelete(bid._id)}
-                        className="text-red-600 hover:text-red-800 font-medium"
+                      <div className="flex gap-4">
+                        {!bid.accepted && (
+                          <button
+                            className="text-green-600 hover:text-green-800 font-medium"
+                            onClick={() => handleBidAccept(bid._id)}
+                          >
+                            Accept Bid
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => handleBidDelete(bid._id)}
+                          className="text-red-600 hover:text-red-800 font-medium"
+                        >
+                          Delete Bid
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+              <BidModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                bid={selectedBid}
+                onSubmit={handleBidUpdate}
+              />
+
+              {sentBids.length > 0 &&
+                bidType === 2 &&
+                sentBids.map((bid) => (
+                  <div
+                    key={bid._id}
+                    className="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200"
+                  >
+                    {/* Listing Information */}
+                    <div className="px-4 py-5 sm:px-6 border-b">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          {listings[bid.listingRef]?.name || "Loading..."}
+                        </h3>
+                        {/* show whether bid is acppeted or not with differnet css styling*/}
+                        <div
+                          className={`${
+                            bid.accepted
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
+                          } px-2 py-1 rounded-md text-sm`}
+                        >
+                          {bid.accepted ? "Accepted" : "Not Accepted"}
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-500 mt-2">
+                        <p>{listings[bid.listingRef]?.type || "Loading..."}</p>
+                        <p>
+                          {listings[bid.listingRef]?.address || "Loading..."}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bid Information */}
+                    <div className="px-4 py-5 sm:px-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Name
+                          </p>
+                          <p className="text-sm text-gray-500">{bid.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Email
+                          </p>
+                          <p className="text-sm text-gray-500">{bid.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Phone
+                          </p>
+                          <p className="text-sm text-gray-500">{bid.phone}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            Offer Amount
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            {bid.offer} Rs
+                          </p>
+                        </div>
+                        {bid.occupants != -1 && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">
+                              Occupants
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {bid.occupants}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {bid.message != "Not specified" && (
+                        <div className="mt-4">
+                          <p className="text-sm font-medium text-gray-900">
+                            Message
+                          </p>
+                          <p className="text-sm text-gray-500">{bid.message}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="px-4 py-4 sm:px-6 border-t flex justify-between">
+                      <Link
+                        to={`/listing/${bid.listingRef}`}
+                        className="text-blue-600 hover:text-blue-800 font-medium"
                       >
-                        Delete Bid
-                      </button>
+                        View Listing
+                      </Link>
+                      {/* add button to modify bid */}
+                      <div className="flex gap-4">
+                        <button
+                          className="text-blue-600 hover:text-blue-800 font-medium"
+                          onClick={() => handleEditClick(bid)}
+                        >
+                          Modify Bid
+                        </button>
+                        <button
+                          onClick={() => handleBidDelete(bid._id)}
+                          className="text-red-600 hover:text-red-800 font-medium"
+                        >
+                          Delete Bid
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

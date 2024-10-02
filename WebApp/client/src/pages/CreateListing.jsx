@@ -265,7 +265,7 @@ export default function CreateListing() {
                   Address
                 </label>
                 <div className="flex flex-wrap">
-                  <div className="w-full sm:w-1/2 pr-2">
+                  <div className="w-full sm:w-1/2 px-2 mb-4 sm:mb-0">
                     <input
                       type="text"
                       id="house"
@@ -278,7 +278,7 @@ export default function CreateListing() {
                       className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
-                  <div className="w-full sm:w-1/2 pl-2">
+                  <div className="w-full sm:w-1/2 px-2">
                     <input
                       type="text"
                       id="street"
@@ -293,7 +293,7 @@ export default function CreateListing() {
                   </div>
                 </div>
                 <div className="flex flex-wrap mt-4">
-                  <div className="w-full sm:w-3/5 pr-2">
+                  <div className="w-full sm:w-3/5 px-2 mb-4 sm:mb-0">
                     <input
                       type="text"
                       id="area"
@@ -306,7 +306,7 @@ export default function CreateListing() {
                       className="block w-full rounded-md border-0 outline-0 py-2.5 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     />
                   </div>
-                  <div className="w-full sm:w-2/5 pl-2 mb-4">
+                  <div className="w-full sm:w-2/5 px-2 mb-4 relative">
                     <select
                       id="city"
                       required
@@ -440,7 +440,7 @@ export default function CreateListing() {
                     <div className="flex flex-col items-center">
                       <p>Regular price</p>
                       {formData.type === "rent" && (
-                        <span className="text-xs">($ / month)</span>
+                        <span className="text-xs">(Rs / month)</span>
                       )}
                     </div>
                   </div>

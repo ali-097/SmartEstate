@@ -41,10 +41,9 @@ export const updateBid = async (req, res, next) => {
   if (!bid) {
     return next(errorHandler(404, "Bid not found!"));
   }
-  if (req.user.id !== bid.userRef) {
+  if (req.user.id !== bid.bidderRef) {
     return next(errorHandler(401, "You can only update your own bids!"));
   }
-
   try {
     const updatedBid = await Bid.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -67,14 +66,23 @@ export const getBid = async (req, res, next) => {
   }
 };
 
-export const getBids = async (req, res, next) => {
+export const getSentBids = async (req, res, next) => {
   try {
-    const bids = await Bid.find({ userRef: req.user.id });
+    const bids = await Bid.find({ bidderRef: req.params.id });
     res.status(200).json(bids);
   } catch (error) {
     next(error);
   }
 };
+
+// export const getBids = async (req, res, next) => {
+//   try {
+//     const bids = await Bid.find({ userRef: req.user.id });
+//     res.status(200).json(bids);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const getAllBids = async (req, res, next) => {
   try {
