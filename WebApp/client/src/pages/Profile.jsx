@@ -18,6 +18,7 @@ import {
   updateUserStart,
   updateUserSuccess,
 } from "../redux/user/userSlice";
+import ImageModal from "../components/ImageModal";
 
 const Profile = () => {
   const fileRef = useRef(null);
@@ -28,6 +29,8 @@ const Profile = () => {
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [totalBids, setTotalBids] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
+  const [currentImage, setCurrentImage] = useState("");
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -139,6 +142,15 @@ const Profile = () => {
     }
   };
 
+  const openModal = () => {
+    setCurrentImage(formData.avatar || currentUser.avatar);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <Helmet title={"Profile"}>
       <section className="flex min-h-full flex-1 flex-col justify-center px-6 py-6 lg:px-8">
@@ -160,10 +172,11 @@ const Profile = () => {
               />
               <div className="relative self-center">
                 <img
-                  onClick={() => fileRef.current.click()}
+                  onClick={openModal}
                   src={formData.avatar || currentUser.avatar}
                   alt="profile"
                   className="rounded-full h-28 w-28 object-cover cursor-pointer mb-2 border-4 border-gray-200 shadow-lg"
+                  // onClick={() => fileRef.current.click()}
                 />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -171,6 +184,7 @@ const Profile = () => {
                   height="30"
                   className="absolute bottom-0 right-0 cursor-pointer"
                   viewBox="0 0 24 24"
+                  onClick={() => fileRef.current.click()}
                 >
                   <path
                     fill="#0025ba"
@@ -281,15 +295,15 @@ const Profile = () => {
               View your Listings
             </Link>
           </div>
-
           <div className="mt-2 flex items-center justify-center">
             <Link
               to={"/create-review"}
-              className="mt-4 bg-gradient-to-r from-blue-500 via-blue-300 to-blue-500 flex items-center gap-2 w-full justify-center rounded-md bg-gray-100 px-3 py-1.5"
+              className="mt-4 flex items-center gap-2 w-full justify-center rounded-md bg-gray-300 px-3 py-1.5 ring-1 ring-inset ring-gray-300 text-sm font-semibold leading-6 text-gray-950 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               Create Review
             </Link>
           </div>
+
           <div className="mt-2 flex items-center justify-center">
             <Link
               to={"/my-reviews"}
@@ -327,6 +341,14 @@ const Profile = () => {
               </span>
             </div>
           </div>
+          <ImageModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            images={[currentImage]}
+            currentIndex={0}
+            setCurrentIndex={() => {}}
+            viewButtons={false}
+          />
         </div>
       </section>
     </Helmet>

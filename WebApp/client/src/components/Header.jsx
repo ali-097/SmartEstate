@@ -18,6 +18,14 @@ const links = [
     href: "/search",
   },
   {
+    name: "Price Prediction",
+    href: "/price-prediction",
+  },
+  {
+    name: "Community reviews",
+    href: "/community-reviews",
+  },
+  {
     name: "Benefits",
     href: "/benefits",
   },
@@ -30,12 +38,8 @@ const links = [
     href: "/contact",
   },
   {
-    name: "Price Prediction",
-    href: "/price-prediction",
-  },
-  {
-    name: "Community reviews",
-    href: "/community-reviews",
+    name: "About",
+    href: "/about",
   },
 ];
 

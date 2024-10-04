@@ -5,8 +5,8 @@ const Footer = () => {
   return (
     <footer className="pt-12 pb-8">
       <div className="max-w-7xl mx-auto grid gap-y-8 px-4 lg:px-8 xl:max-w-full">
-        <div className="grid gap-y-8 md:grid-cols-2 lg:grid-cols-4">
-          {/* <div className="grid gap-y-8 md:grid-cols-[repeat(2,1fr)] lg:grid-cols-[repeat(4,max-content)] justify-between"> */}
+        {/* <div className="grid gap-y-8 md:grid-cols-2 lg:grid-cols-4"> */}
+        <div className="grid gap-y-8 md:grid-cols-[repeat(2,1fr)] lg:grid-cols-[repeat(4,max-content)] justify-between">
           <div>
             <Link
               to="/"
@@ -22,7 +22,7 @@ const Footer = () => {
             <ul className="flex flex-col gap-y-3">
               <li>
                 <Link
-                  to="/"
+                  to="/about"
                   className="text-base text-gray-900 transition duration-300 easy-in-out hover:text-myblue"
                 >
                   About Us
@@ -30,20 +30,20 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/"
+                  to="/contact"
                   className="text-base text-gray-900 transition duration-300 easy-in-out hover:text-myblue"
                 >
                   Contact Us
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/"
                   className="text-base text-gray-900 transition duration-300 easy-in-out hover:text-myblue"
                 >
                   Careers
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
           <div>
@@ -51,31 +51,31 @@ const Footer = () => {
             <ul className="flex flex-col gap-y-3">
               <li>
                 <Link
-                  to="/"
+                  to="/benefits"
                   className="text-base text-gray-900 transition duration-300 easy-in-out hover:text-myblue"
                 >
-                  Help Center
+                  Benefits
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/"
+                  to="/faqs"
                   className="text-base text-gray-900 transition duration-300 easy-in-out hover:text-myblue"
                 >
                   FAQs
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/"
                   className="text-base text-gray-900 transition duration-300 easy-in-out hover:text-myblue"
                 >
                   Blog
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
-          <div>
+          {/* <div>
             <h3 className="font-bold mb-2">Legal</h3>
             <ul className="flex flex-col gap-y-3">
               <li>
@@ -103,7 +103,7 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
-          </div>
+          </div> */}
         </div>
         <div className="relative flex flex-col text-base pt-8">
           <div className="w-full border border-solid border-[#eaecf0] mb-4"></div>

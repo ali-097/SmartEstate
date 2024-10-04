@@ -4,6 +4,7 @@ import Helmet from "../components/Helmet";
 import { useSelector } from "react-redux";
 import ContactLandlord from "../components/ContactLandlord";
 import DisplayLocation from "../components/DisplayLocation";
+import ImageModal from "../components/ImageModal";
 
 const Listing = () => {
   const params = useParams();
@@ -14,6 +15,7 @@ const Listing = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loginError, setLoginError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const prevSlide = () => {
     const isFirstSlide = currentIndex === 0;
@@ -50,7 +52,15 @@ const Listing = () => {
     fetchListing();
   }, [params.listingId]);
 
-  console.log(listing);
+  const openModal = (index) => {
+    setCurrentIndex(index);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <Helmet title={"Listing"}>
       <section className="listings">
@@ -130,7 +140,10 @@ const Listing = () => {
                       />
                     </svg>
                   </div>
-                  <div className="absolute top-0 bottom-0 left-0 right-0 bg-black/30"></div>
+                  <div
+                    onClick={() => openModal(index)}
+                    className="absolute top-0 bottom-0 left-0 right-0 bg-black/30"
+                  ></div>
                 </React.Fragment>
               ))}
             </div>
@@ -271,7 +284,7 @@ const Listing = () => {
                       </li>
                     </ul>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-4 z-0">
                     <DisplayLocation
                       location={listing.location}
                       address={listing.address}
@@ -332,6 +345,14 @@ const Listing = () => {
                 </div>
               </div>
             </div>
+            <ImageModal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              images={listing.imageUrls}
+              currentIndex={currentIndex}
+              setCurrentIndex={setCurrentIndex}
+              viewButtons={true}
+            />
           </>
         )}
       </section>

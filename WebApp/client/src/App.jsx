@@ -9,6 +9,7 @@ import Listing from "./pages/Listing";
 import Benefits from "./pages/Benefits";
 import Faqs from "./pages/Faqs";
 import Contact from "./pages/Contact";
+import About from "./pages/About";
 import PrivateRoute from "./components/PrivateRoute";
 import CreateListing from "./pages/CreateListing";
 import MyListings from "./pages/MyListings";
@@ -30,6 +31,7 @@ function App() {
         <Route path="/benefits" element={<Benefits />} />
         <Route path="/faqs" element={<Faqs />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/sign-up" element={<Register />} />
         <Route path="/search" element={<Search />} />
