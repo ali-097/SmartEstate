@@ -9,7 +9,8 @@ export default defineConfig({
     port: 5173, // Ensure this is the port you're using
     proxy: {
       "/api": {
-        target: "http://localhost:3000",
+        // target: "http://localhost:3000",
+        target: "https://smart-estate-api-git-main-alis-projects-6e8df9cb.vercel.app/",
         secure: false,
       },
       "/modelsapi": {
