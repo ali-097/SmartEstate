@@ -231,14 +231,14 @@ const MyReviews = () => {
                           Sentiment:{" "}
                           <span
                             className={
-                              review.sentiment === 1
+                              review.sentiment == 1
                                 ? "text-green-600"
                                 : review.sentiment === "Negative"
                                 ? "text-red-600"
                                 : "text-yellow-600"
                             }
                           >
-                            {review.sentiment === 1 ? "Positive" : "Negative"}
+                            {review.sentiment == 1 ? "Positive" : "Negative"}
                           </span>
                         </p>
                       )}

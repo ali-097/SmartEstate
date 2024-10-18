@@ -19,14 +19,13 @@ export const createBid = async (req, res, next) => {
 
 export const deleteBid = async (req, res, next) => {
   const bid = await Bid.findById(req.params.id);
-
   if (!bid) {
     return next(errorHandler(404, "Bid not found!"));
   }
 
-  if (req.user.id !== bid.userRef) {
-    return next(errorHandler(401, "You can only delete your own bids"));
-  }
+  // if (req.user.id !== bid.userRef ) {
+  //   return next(errorHandler(401, "You can only delete your own bids"));
+  // }
 
   try {
     await Bid.findByIdAndDelete(req.params.id);
@@ -37,7 +36,9 @@ export const deleteBid = async (req, res, next) => {
 };
 
 export const updateBid = async (req, res, next) => {
+  console.log(req.params.id);
   const bid = await Bid.findById(req.params.id);
+  console.log(bid);
   if (!bid) {
     return next(errorHandler(404, "Bid not found!"));
   }

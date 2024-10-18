@@ -25,22 +25,22 @@ const links = [
     name: "Community reviews",
     href: "/community-reviews",
   },
-  {
-    name: "Benefits",
-    href: "/benefits",
-  },
-  {
-    name: "FAQs",
-    href: "/faqs",
-  },
+  // {
+  //   name: "Benefits",
+  //   href: "/benefits",
+  // },
+  // {
+  //   name: "FAQs",
+  //   href: "/faqs",
+  // },
   {
     name: "Contact",
     href: "/contact",
   },
-  {
-    name: "About",
-    href: "/about",
-  },
+  // {
+  //   name: "About",
+  //   href: "/about",
+  // },
 ];
 
 const Header = () => {
@@ -243,7 +243,7 @@ const Header = () => {
               </Link>
               <Link
                 to="/sign-up"
-                className="text-base font-medium leading-7 bg-myblue py-2 px-4 rounded text-white"
+                className="text-base font-medium leading-7 bg-myblue py-2 px-4 rounded text-white whitespace-nowrap"
               >
                 Sign up
               </Link>

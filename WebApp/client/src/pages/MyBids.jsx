@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Helmet from "../components/Helmet";
 import BidModal from "../components/BidModal";
+import emailjs from "@emailjs/browser";
 
 const MyBids = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -20,6 +21,17 @@ const MyBids = () => {
   }, []);
 
   const handleEditClick = (bid) => {
+    if (bid.accepted) {
+      setShowBidsError("Cannot modify an accepted bid.");
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+      setTimeout(() => {
+        setShowBidsError("");
+      }, 3000);
+      return;
+    }
     setSelectedBid(bid);
     setIsModalOpen(true);
   };
@@ -84,7 +96,50 @@ const MyBids = () => {
     setListings(fetchedListings);
   };
 
-  const handleBidDelete = async (bidId) => {
+  const handleBidDelete = async (bidId, deletionType) => {
+    if (
+      sentBids.find((bid) => bid._id === bidId)?.accepted ||
+      userBids.find((bid) => bid._id === bidId)?.accepted
+    ) {
+      setShowBidsError("Cannot delete an accepted bid.");
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+
+      setTimeout(() => {
+        setShowBidsError("");
+      }, 3000);
+      return;
+    }
+
+    if (deletionType === "reject") {
+      const bid = userBids.find((bid) => bid._id === bidId);
+
+      const templateParams = {
+        user_email: bid.email,
+        user_name: bid.name,
+        listing_name: listings[bid.listingRef]?.name || "Unknown Listing",
+        offer_amount: bid.offer,
+        rejection_message:
+          "We're sorry to inform you that your bid has been rejected.",
+      };
+
+      try {
+        emailjs.send(
+          // 'YOUR_SERVICE_ID',
+          import.meta.env.VITE_SERVICE_ID,
+          // 'YOUR_TEMPLATE_ID',
+          import.meta.env.VITE_ALT_TEMPLATE_ID,
+          templateParams,
+          import.meta.env.VITE_PUBLIC_KEY
+          // form.current, 'YOUR_PUBLIC_KEY'
+        );
+      } catch (error) {
+        console.error("Failed to send email:", error);
+      }
+    }
+
     try {
       const res = await fetch(`/api/bid/delete/${bidId}`, {
         method: "DELETE",
@@ -94,8 +149,8 @@ const MyBids = () => {
         console.log(data.message);
         return;
       }
-
       setUserBids((prev) => prev.filter((bid) => bid._id !== bidId));
+      setSentBids((prev) => prev.filter((bid) => bid._id !== bidId));
     } catch (error) {
       console.log(error.message);
     }
@@ -303,10 +358,10 @@ const MyBids = () => {
                         )}
 
                         <button
-                          onClick={() => handleBidDelete(bid._id)}
+                          onClick={() => handleBidDelete(bid._id, "reject")}
                           className="text-red-600 hover:text-red-800 font-medium"
                         >
-                          Delete Bid
+                          Reject Bid
                         </button>
                       </div>
                     </div>
@@ -420,7 +475,7 @@ const MyBids = () => {
                           Modify Bid
                         </button>
                         <button
-                          onClick={() => handleBidDelete(bid._id)}
+                          onClick={() => handleBidDelete(bid._id, "delete")}
                           className="text-red-600 hover:text-red-800 font-medium"
                         >
                           Delete Bid
