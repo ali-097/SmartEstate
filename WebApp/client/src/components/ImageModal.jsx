@@ -22,7 +22,7 @@ const ImageModal = ({
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-75 p-4">
-      <div className="relative max-w-3xl w-full bg-white rounded-lg overflow-hidden shadow-xl transition-transform transform-gpu">
+      <div className="relative max-w-3xl w-[70vh] bg-white rounded-lg overflow-hidden shadow-xl transition-transform transform-gpu">
         <img
           src={images[currentIndex]}
           alt={`Image ${currentIndex + 1}`}
